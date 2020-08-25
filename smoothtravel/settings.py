@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-import django_heroku 
+import django_heroku
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
