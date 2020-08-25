@@ -1,11 +1,6 @@
-"""
-Admin config for smoothtravel project.
-
-For more information on this file, see
-https://docs.djangoproject.com/
-"""
-from .models import Flight, Hotel
+'''Admin config for smoothtravel project '''
 from django.contrib import admin
+from .models import Flight, Hotel
 
 # Register your models here.
 admin.site.register(Flight)
