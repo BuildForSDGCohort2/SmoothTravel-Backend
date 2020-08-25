@@ -1,4 +1,3 @@
-'''Admin config for smoothtravel project '''
 from django.contrib import admin
 from .models import Flight, Hotel
 
