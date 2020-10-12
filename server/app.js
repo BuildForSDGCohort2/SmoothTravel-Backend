@@ -8,6 +8,8 @@ import {buildSchema} from 'graphql'
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 
+import Reservation from './models/reservation';
+
 const app = express();
 
 app.use(logger('dev'));
@@ -18,17 +20,6 @@ app.use(express.static(join(__dirname, '../public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-const Reservations = [
-	{
-		location: 'Lusaka',
-		checkin_date: '1600966570381',
-		checkout_date: '1600966603898',
-		number_of_rooms: 2,
-		cost_per_night: 200,
-		number_of_people: { adults: 2, children: 2, pets: 1 }
-	}
-];
 
 const Bookings = [
 	{
@@ -46,6 +37,8 @@ app.use(
 	graphqlHTTP({
 		schema: buildSchema(`
       type Reservation {
+				_id: ID!
+				booked_on: String!
         location: String!
         checkin_date: String!
         checkout_date: String!
@@ -110,7 +103,20 @@ app.use(
   `),
 		rootValue: {
 			getReservations: () => {
-				return Reservations;
+				return Reservation.find()
+				.then((reservations) => {
+					return reservations.map((reservation) => {
+						return {
+							...reservation._doc,
+							_id: reservation._doc._id.toString(),
+							booked_on: reservation._doc._id.getTimestamp()
+						};
+					});
+				})
+				.catch((err) => {
+					console.log(err);
+					throw err;
+				});
 			},
 			getBookings: () => {
 				return Bookings;
@@ -141,24 +147,26 @@ app.use(
 			},
 			makeReservation: (args) => {
 				const Arguments = { ...args.reservationInput };
-				let location = Arguments.location;
-				let checkInDate = Arguments.checkin_date;
-				let CheckOutDate = Arguments.checkout_date;
-				let numberOfRooms = Arguments.number_of_rooms;
-				let costPerNight = Arguments.cost_per_night;
-				let people = Arguments.number_of_people[0];
-				let numberOfPeople = { ...people };
-				let reservation = {
-					location: location,
-					checkin_date: checkInDate,
-					checkout_date: CheckOutDate,
-					number_of_rooms: numberOfRooms,
-					cost_per_night: costPerNight,
+				const numberOfPeople = {...Arguments.number_of_people[0]}
+				const reservation = new Reservation({
+					location: Arguments.location,
+					checkin_date: Arguments.checkin_date,
+					checkout_date: Arguments.checkout_date,
+					number_of_rooms: Arguments.number_of_rooms,
+					cost_per_night: Arguments.cost_per_night,
 					number_of_people: numberOfPeople
-				};
-
-				Reservations.push(reservation);
-				return reservation;
+				})
+				return reservation.save().then(result => {
+					return {
+						...result._doc,
+						_id: result._doc._id.toString(),
+						booked_on: result._doc._id.getTimestamp().toString()
+					};
+				})
+				.catch((err) => {
+					console.log(err);
+					throw err;
+				});
 			}
 		},
 		graphiql: true
