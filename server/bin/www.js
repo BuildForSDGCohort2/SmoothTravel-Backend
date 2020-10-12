@@ -7,6 +7,9 @@
 import app from '../app';
 import debugLib from 'debug';
 import { createServer } from 'http';
+
+import mongoose from 'mongoose'
+
 const debug = debugLib('smoothtravel-backend:server');
 
 /**
@@ -26,7 +29,24 @@ var server = createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+ const MONGO_USER = process.env.MONGO_USER;
+ const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
+ const MONGO_DB = process.env.MONGO_DB;
+
+ const MONGO_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@learning-mongo-db.6hggv.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority`;
+
+// connect to mongo database
+ mongoose
+	.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+	.then(() => {
+		server.listen(port);
+		server.on('listening', onListening);
+	})
+	.catch((err) => {
+		console.log(err);
+		onError;
+	});
+
 server.on('error', onError);
 server.on('listening', onListening);
 
