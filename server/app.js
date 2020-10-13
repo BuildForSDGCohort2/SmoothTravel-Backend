@@ -24,6 +24,7 @@ app.use('/users', usersRouter);
 const Bookings = [
 	{
 		departure: 'Lusaka',
+		departureDate: '',
 		destination: 'Nairobi',
 		departure_date: '1600967084953',
 		flight_type: 'one-way',

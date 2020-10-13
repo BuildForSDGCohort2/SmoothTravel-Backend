@@ -2,6 +2,7 @@
 	"name": "smoothtravel-backend",
 	"version": "0.0.0",
 	"private": true,
+	"main": "dist-server/bin/www.js",
 	"nodemonConfig": {
 		"exec": "npm run dev",
 		"watch": [
@@ -41,5 +42,8 @@
 	"devDependencies": {
 		"dotenv": "^8.2.0",
 		"nodemon": "^2.0.4"
+	},
+	"engines": {
+		"node": "14.x"
 	}
 }
